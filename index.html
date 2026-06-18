@@ -82,10 +82,10 @@
             timestamp: new Date().toISOString()
         };
 
-        // Transmit data cleanly to the destination dashboard
+        // Transmit data cleanly using no-cors mode to prevent preflight block
         fetch(webHookUrl, {
             method: "POST",
-            mode: "cors",
+            mode: "no-cors",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         })
